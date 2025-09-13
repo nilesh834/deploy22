@@ -3,8 +3,8 @@ import Navbar from "../components/Navbar";
 import { useNavigate, useParams } from "react-router-dom";
 import { facilities } from "../data";
 
-import "react-date-range/dist/styles.css"; // main style file
-import "react-date-range/dist/theme/default.css"; // theme css file
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 
 import { DateRange } from "react-date-range";
 import { useSelector } from "react-redux";
@@ -20,7 +20,6 @@ const ListingDetails = () => {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/listing/${listingId}`
       );
-
       const data = await response.json();
       setListing(data);
     } catch (error) {
@@ -32,7 +31,7 @@ const ListingDetails = () => {
     getListingDetails();
   }, []);
 
-  //Calender
+  // Calendar
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
@@ -47,14 +46,10 @@ const ListingDetails = () => {
 
   const start = new Date(dateRange[0].startDate);
   const end = new Date(dateRange[0].endDate);
-
-  // Ensure minimum 1 night
   const rawDayCount = Math.round((end - start) / (1000 * 60 * 60 * 24));
   const dayCount = rawDayCount > 0 ? rawDayCount : 1;
 
-  //  Booking
   const customerId = useSelector((state) => state?.user?.user?._id);
-
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
@@ -69,26 +64,24 @@ const ListingDetails = () => {
         totalPrice: listing.price * dayCount,
       };
 
-      const res = await toast.promise(
-        fetch(`${import.meta.env.VITE_API_URL}/api/booking/create`, {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/booking/create`,
+        {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(bookingForm),
-        }),
-        {
-          loading: "Creating booking...",
-          success: "Booking confirmed 🎉",
-          error: "Booking failed ❌",
         }
       );
 
-      if (!res.ok) throw new Error("Failed to create booking");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to create booking");
 
+      toast.success("Booking confirmed 🎉");
       navigate(`/${customerId}/trips`);
     } catch (error) {
-      toast.error(error.message); // fallback with real backend error
+      toast.error(error.message);
     } finally {
-      setLoading(false); // stop loading
+      setLoading(false);
     }
   };
 
@@ -104,7 +97,6 @@ const ListingDetails = () => {
   return (
     <>
       <Navbar />
-
       <div className="px-5 py-10 lg:px-12">
         <div className="flex justify-between items-center sm:flex-col sm:items-start sm:gap-4">
           <h1 className="text-2xl font-bold text-slate-700">
@@ -115,7 +107,7 @@ const ListingDetails = () => {
         <div className="flex flex-wrap gap-2.5 my-5">
           {listing?.listingPhotoPaths?.map((item, index) => (
             <img
-              src={item} // Cloudinary URL directly
+              src={item}
               alt="listing photo"
               className="max-h-[280px] max-w-[280px] object-cover"
               key={index}
@@ -123,7 +115,7 @@ const ListingDetails = () => {
           ))}
         </div>
 
-        <h2 className="text-xl font-bold text-slate-700 ">
+        <h2 className="text-xl font-bold text-slate-700">
           {listing?.type} in {listing?.city}, {listing?.state},{" "}
           {listing?.country}
         </h2>
@@ -135,14 +127,12 @@ const ListingDetails = () => {
         <hr className="my-4 border-gray-300" />
 
         {/* Owner Profile */}
-
         <div className="flex gap-5 items-center">
           <img
-            src={listing?.creator?.profileImagePath} // Cloudinary URL directly
+            src={listing?.creator?.profileImagePath}
             alt="profile pic"
             className="w-[60px] h-[60px] m-0 rounded-full object-cover"
           />
-
           <h3 className="text-slate-700 font-semibold">
             Owned by {listing?.creator?.firstName} {listing?.creator?.lastName}
           </h3>
@@ -151,7 +141,6 @@ const ListingDetails = () => {
         <hr className="my-4 border-gray-300" />
 
         <h3 className="text-xl font-bold text-slate-700">Description</h3>
-
         <p className="max-w-[800px] mt-5 text-slate-700">
           {listing?.description}
         </p>
@@ -163,7 +152,6 @@ const ListingDetails = () => {
             <h2 className="text-xl font-bold text-slate-700">
               What kind of offers will provide
             </h2>
-
             <div className="grid grid-cols-2 gap-x-5 sm:gap-x-24 my-7 max-w-[700px]">
               {listing?.amenities?.map((item, index) => (
                 <div
@@ -189,7 +177,7 @@ const ListingDetails = () => {
               <DateRange
                 ranges={dateRange}
                 onChange={handleSelect}
-                minDate={new Date()} // Prevent past dates
+                minDate={new Date()}
               />
 
               {dayCount > 1 ? (
@@ -202,7 +190,7 @@ const ListingDetails = () => {
                 </h2>
               )}
 
-              <h2 className=" font-bold text-slate-700 mb-2.5">
+              <h2 className="font-bold text-slate-700 mb-2.5">
                 Total price: ₹{listing?.price * dayCount}
                 <p className="text-slate-700">
                   Start Date: {dateRange[0].startDate.toDateString()}
@@ -211,7 +199,6 @@ const ListingDetails = () => {
                   End Date: {dateRange[0].endDate.toDateString()}
                 </p>
                 {customerId === listing?.creator?._id ? (
-                  // If the logged-in user is the owner
                   <button
                     className="w-full mt-7 sm:max-w-[300px] text-white bg-gray-400 p-2 rounded-lg cursor-not-allowed"
                     disabled
@@ -219,7 +206,6 @@ const ListingDetails = () => {
                     Unavailable
                   </button>
                 ) : (
-                  // Otherwise show booking button
                   <button
                     className="w-full mt-7 sm:max-w-[300px] text-white bg-slate-700 p-2 rounded-lg hover:opacity-95 uppercase"
                     type="submit"

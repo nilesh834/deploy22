@@ -42,21 +42,20 @@ const RegisterPage = () => {
         if (val) registerForm.append(key, val);
       });
 
-      const res = await toast.promise(
-        fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        {
           method: "POST",
           body: registerForm,
-        }),
-        {
-          loading: "Registering...",
-          success: "Registration successful 🎉",
-          error: "Registration failed ❌",
         }
       );
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Registration failed");
+      if (!res.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
 
+      toast.success("Registration successful 🎉");
       navigate("/login");
     } catch (error) {
       toast.error(error.message);

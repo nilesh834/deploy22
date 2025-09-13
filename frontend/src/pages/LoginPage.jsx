@@ -17,29 +17,31 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await toast.promise(
-        fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
-        }),
-        {
-          loading: "Logging in...",
-          success: "Login successful ✅",
-          error: "Login failed ❌",
         }
       );
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed");
+
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      toast.success("Login successful ✅");
 
       dispatch(
         setLogin({
           user: data.rest,
           token: data.token,
-          expiresIn: data.expiresIn, // seconds
+          expiresIn: data.expiresIn,
         })
       );
+
       navigate("/");
     } catch (error) {
       toast.error(error.message);
