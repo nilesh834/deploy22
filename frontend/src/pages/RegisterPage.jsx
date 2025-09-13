@@ -118,9 +118,9 @@ const RegisterPage = () => {
           required
         />
 
-        {!passwordMatch && (
+        {/* {!passwordMatch && (
           <p className="text-red-500">Passwords do not match.</p>
-        )}
+        )} */}
 
         <input
           id="image"
