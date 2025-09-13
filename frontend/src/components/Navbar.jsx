@@ -58,7 +58,7 @@ const Navbar = () => {
         {user ? (
           <Link
             to={"/create-listing"}
-            className="hidden sm:block no-underline texxt-slate-500 font-bold cursor-pointer hover:text-blue-500"
+            className="hidden sm:block no-underline text-slate-500 font-bold cursor-pointer hover:text-blue-500"
           >
             Become A Host
           </Link>
