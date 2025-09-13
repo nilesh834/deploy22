@@ -64,6 +64,9 @@ const RegisterPage = () => {
     }
   };
 
+  const isFormIncomplete =
+    !formData.firstName || !formData.lastName || !formData.profileImage;
+
   return (
     <div className="max-w-lg mx-auto p-3">
       <h1 className="text-3xl text-center my-7 font-semibold">Sign Up</h1>
