@@ -147,7 +147,20 @@ const RegisterPage = () => {
 
         <button
           className="bg-slate-700 rounded-lg p-3 text-white uppercase hover:opacity-95 disabled:opacity-80"
-          disabled={!passwordMatch || loading}
+          disabled={
+            !passwordMatch ||
+            loading ||
+            !formData.firstName ||
+            !formData.lastName ||
+            !formData.profileImage
+          }
+          title={
+            !formData.firstName || !formData.lastName || !formData.profileImage
+              ? "All fields required"
+              : !passwordMatch
+              ? "Passwords do not match"
+              : ""
+          }
         >
           {loading ? "Registering..." : "Register"}
         </button>
