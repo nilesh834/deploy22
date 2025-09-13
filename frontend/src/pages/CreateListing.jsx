@@ -7,10 +7,12 @@ import { IoIosImages } from "react-icons/io";
 import { BiTrash } from "react-icons/bi";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const CreateListing = () => {
   const [category, setCategory] = useState();
   const [type, setType] = useState();
+  const [loading, setLoading] = useState(false);
 
   const [guestCount, setGuestCount] = useState(1);
   const [bedroomCount, setBedroomCount] = useState(1);
@@ -98,10 +100,10 @@ const CreateListing = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const listingForm = new FormData();
-
       listingForm.append("creator", creatorId);
       listingForm.append("category", category);
       listingForm.append("type", type);
@@ -114,28 +116,32 @@ const CreateListing = () => {
       listingForm.append("bedroomCount", bedroomCount);
       listingForm.append("bedCount", bedCount);
       listingForm.append("bathroomCount", bathroomCount);
-      // Amenities as JSON
       listingForm.append("amenities", JSON.stringify(amenities));
       listingForm.append("title", formDescription.title);
       listingForm.append("description", formDescription.description);
       listingForm.append("price", formDescription.price);
 
-      photos.forEach((photo) => {
-        listingForm.append("listingPhotos", photo);
-      });
+      photos.forEach((photo) => listingForm.append("listingPhotos", photo));
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/listing/create`,
-        {
+      const res = await toast.promise(
+        fetch(`${import.meta.env.VITE_API_URL}/api/listing/create`, {
           method: "POST",
           body: listingForm,
+        }),
+        {
+          loading: "Creating listing...",
+          success: "Listing created successfully 🏠",
+          error: "Failed to create listing ❌",
         }
       );
-      if (res.ok) {
-        navigate("/");
-      }
+
+      if (!res.ok) throw new Error("Failed to create listing");
+
+      navigate("/");
     } catch (error) {
-      console.log(error);
+      toast.error(error.message); // backend error fallback
+    } finally {
+      setLoading(false); // stop loading
     }
   };
 
@@ -532,8 +538,11 @@ const CreateListing = () => {
               </div>
             </div>
           </div>
-          <button className="mt-10 bg-blue-800 text-white py-2 px-6 rounded-lg hover:shadow-2xl uppercase">
-            Create Your Listing
+          <button
+            className="mt-10 bg-blue-800 text-white py-2 px-6 rounded-lg hover:shadow-2xl uppercase"
+            disabled={loading} // disable while loading
+          >
+            {loading ? "Creating..." : "Create Your Listing"}
           </button>
         </form>
       </div>

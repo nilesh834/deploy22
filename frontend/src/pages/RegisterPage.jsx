@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import uploadProfilePic from "../assets/upload.png";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -11,9 +12,8 @@ const RegisterPage = () => {
     confirmPassword: "",
     profileImage: "",
   });
-
   const [passwordMatch, setPasswordMatch] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -34,30 +34,34 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       const registerForm = new FormData();
-      registerForm.append("firstName", formData.firstName);
-      registerForm.append("lastName", formData.lastName);
-      registerForm.append("email", formData.email);
-      registerForm.append("password", formData.password);
-      registerForm.append("profileImage", formData.profileImage);
+      Object.entries(formData).forEach(([key, val]) => {
+        if (val) registerForm.append(key, val);
+      });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/register`,
-        {
+      const res = await toast.promise(
+        fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
           method: "POST",
           body: registerForm,
+        }),
+        {
+          loading: "Registering...",
+          success: "Registration successful 🎉",
+          error: "Registration failed ❌",
         }
       );
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Registration failed");
 
       navigate("/login");
     } catch (error) {
-      setErrorMsg(error.message);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -115,7 +119,6 @@ const RegisterPage = () => {
         {!passwordMatch && (
           <p className="text-red-500">Passwords do not match.</p>
         )}
-        {errorMsg && <p className="text-red-500">{errorMsg}</p>}
 
         <input
           id="image"
@@ -145,9 +148,9 @@ const RegisterPage = () => {
 
         <button
           className="bg-slate-700 rounded-lg p-3 text-white uppercase hover:opacity-95 disabled:opacity-80"
-          disabled={!passwordMatch}
+          disabled={!passwordMatch || loading}
         >
-          Register
+          {loading ? "Registering..." : "Register"}
         </button>
       </form>
 

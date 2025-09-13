@@ -8,10 +8,12 @@ import "react-date-range/dist/theme/default.css"; // theme css file
 
 import { DateRange } from "react-date-range";
 import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const ListingDetails = () => {
   const { listingId } = useParams();
   const [listing, setListing] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const getListingDetails = async () => {
     try {
@@ -56,6 +58,7 @@ const ListingDetails = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
       const bookingForm = {
         customerId,
@@ -66,22 +69,26 @@ const ListingDetails = () => {
         totalPrice: listing.price * dayCount,
       };
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/booking/create`,
-        {
+      const res = await toast.promise(
+        fetch(`${import.meta.env.VITE_API_URL}/api/booking/create`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(bookingForm),
+        }),
+        {
+          loading: "Creating booking...",
+          success: "Booking confirmed 🎉",
+          error: "Booking failed ❌",
         }
       );
 
-      if (response.ok) {
-        navigate(`/${customerId}/trips`);
-      }
+      if (!res.ok) throw new Error("Failed to create booking");
+
+      navigate(`/${customerId}/trips`);
     } catch (error) {
-      console.log(error);
+      toast.error(error.message); // fallback with real backend error
+    } finally {
+      setLoading(false); // stop loading
     }
   };
 
@@ -134,7 +141,6 @@ const ListingDetails = () => {
             src={listing?.creator?.profileImagePath} // Cloudinary URL directly
             alt="profile pic"
             className="w-[60px] h-[60px] m-0 rounded-full object-cover"
-            // className="w-[60px] h-[60px] m-0"
           />
 
           <h3 className="text-slate-700 font-semibold">
@@ -218,8 +224,9 @@ const ListingDetails = () => {
                     className="w-full mt-7 sm:max-w-[300px] text-white bg-slate-700 p-2 rounded-lg hover:opacity-95 uppercase"
                     type="submit"
                     onClick={handleSubmit}
+                    disabled={loading}
                   >
-                    Booking
+                    {loading ? "Booking..." : "Book Now"}
                   </button>
                 )}
               </h2>
