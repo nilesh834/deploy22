@@ -118,9 +118,9 @@ const RegisterPage = () => {
           required
         />
 
-        {/* {!passwordMatch && (
+        {!passwordMatch && (
           <p className="text-red-500">Passwords do not match.</p>
-        )} */}
+        )}
 
         <input
           id="image"
@@ -179,9 +179,9 @@ const RegisterPage = () => {
         {isFormIncomplete && (
           <p className="text-red-500 text-sm mt-2">All fields are required.</p>
         )}
-        {!passwordMatch && (
+        {/* {!passwordMatch && (
           <p className="text-red-500 text-sm mt-1">Passwords do not match.</p>
-        )}
+        )} */}
       </form>
 
       <div className="mt-5 flex gap-2">
