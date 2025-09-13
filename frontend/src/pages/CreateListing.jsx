@@ -82,7 +82,7 @@ const CreateListing = () => {
   const [formDescription, setFormDescription] = useState({
     title: "",
     description: "",
-    price: 0,
+    price: "",
   });
 
   const handleChangeDescription = (e) => {
@@ -144,6 +144,14 @@ const CreateListing = () => {
       setLoading(false); // stop loading
     }
   };
+
+  const isFormIncomplete =
+    !category ||
+    !type ||
+    !formDescription.title ||
+    !formDescription.description ||
+    !formDescription.price ||
+    photos.length === 0;
 
   return (
     <>
@@ -539,11 +547,23 @@ const CreateListing = () => {
             </div>
           </div>
           <button
-            className="mt-10 bg-blue-800 text-white py-2 px-6 rounded-lg hover:shadow-2xl uppercase"
-            disabled={loading}
+            className="mt-10 bg-blue-800 text-white py-2 px-6 rounded-lg hover:shadow-2xl uppercase disabled:opacity-70"
+            disabled={loading || isFormIncomplete}
+            title={
+              isFormIncomplete
+                ? "Please complete all required fields before submitting"
+                : ""
+            }
           >
             {loading ? "Creating..." : "Create Your Listing"}
           </button>
+
+          {/* Inline error message */}
+          {isFormIncomplete && !loading && (
+            <p className="text-red-500 text-sm mt-2">
+              Please fill out all fields and upload at least one photo.
+            </p>
+          )}
         </form>
       </div>
     </>

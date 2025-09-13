@@ -50,6 +50,8 @@ const LoginPage = () => {
     }
   };
 
+  const isFormIncomplete = !email || !password;
+
   return (
     <div className="max-w-lg mx-auto p-3">
       <h1 className="text-3xl text-center my-7 font-semibold">Sign In</h1>
@@ -73,10 +75,17 @@ const LoginPage = () => {
         />
         <button
           className="bg-slate-700 rounded-lg p-3 text-white uppercase hover:opacity-95 disabled:opacity-80"
-          disabled={loading}
+          disabled={loading || isFormIncomplete}
         >
           {loading ? "Logging in..." : "Login"}
         </button>
+
+        {/* Inline error message */}
+        {isFormIncomplete && (
+          <p className="text-red-500 text-sm mt-2">
+            Email and password are required.
+          </p>
+        )}
       </form>
 
       <div className="mt-5 flex gap-2">
