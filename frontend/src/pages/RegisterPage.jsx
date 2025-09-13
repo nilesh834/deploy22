@@ -145,7 +145,7 @@ const RegisterPage = () => {
           <p className="text-lg text-slate-700">Upload Your Photo</p>
         </label>
 
-        <button
+        {/* <button
           className="bg-slate-700 rounded-lg p-3 text-white uppercase hover:opacity-95 disabled:opacity-80"
           disabled={
             !passwordMatch ||
@@ -163,7 +163,22 @@ const RegisterPage = () => {
           }
         >
           {loading ? "Registering..." : "Register"}
+        </button> */}
+
+        <button
+          className="bg-slate-700 rounded-lg p-3 text-white uppercase hover:opacity-95 disabled:opacity-80"
+          disabled={!passwordMatch || loading || isFormIncomplete}
+        >
+          {loading ? "Registering..." : "Register"}
         </button>
+
+        {/* Inline error messages */}
+        {isFormIncomplete && (
+          <p className="text-red-500 text-sm mt-2">All fields are required.</p>
+        )}
+        {!passwordMatch && (
+          <p className="text-red-500 text-sm mt-1">Passwords do not match.</p>
+        )}
       </form>
 
       <div className="mt-5 flex gap-2">
